@@ -43,37 +43,6 @@ router.get("/country/:capital", (req, res) => {
   return res.send(response);
 });
 
-router.get("/country-by-author", (req, res) => {
-  const capital = req.query.capital;// Obtenemos el nombre de la capital de la consulta
-  const country = Object.values(data.dataLibrary.countries).find((c) => c.capital === capital);// Buscamos el país correspondiente a la capital especificada
-  //const country = Object.values(data.dataLibrary.countries).find((c) => c.capital === capital);
-  // Si no se encuentra el país, devolvemos un error 404
-  if (!country) {
-    return res.status(404).send({ error: `No se encontró el país correspondiente a la capital ${capital}` });
-  }
-
-  // Si se encuentra el país, hacemos una solicitud HTTP al microservicio de autores para obtener los autores nacidos en ese país.
-  fetch(`http://authors:3000/api/v2/authors/country/${country.name}`)
-    .then(response => response.json())
-    .then(data => {
-      // Creamos una respuesta que incluye el nombre del país y los nombres de los autores nacidos en ese país.
-      const response = {
-        country: country.capital,
-        authors: data.authors.map(author => author.name)
-      };
-
-      // Registramos un mensaje en la consola
-      logger(`Get country by capital: ${capital}`);
-
-      // Enviamos la respuesta al cliente
-      return res.send(response);
-    })
-    .catch(error => {
-      // Si hay un error en la solicitud HTTP, devolvemos un error 500
-      console.error(error);
-      return res.status(500).send({ error: "Error en la solicitud HTTP al microservicio de autores." });
-    });
-});
 
 // Exportamos el router
 module.exports = router;
