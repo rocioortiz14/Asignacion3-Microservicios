@@ -124,7 +124,7 @@ router.get("/igual/:year", (req, res) => {
   return res.send(response); // devuelve la respuesta al cliente
 });
 
-/*router.get("/country/:country", (req, res) => {
+router.get("/country/:country", (req, res) => {
   // busca los libros que se distribuyen en el país buscado
   const books = data.dataLibrary.books.filter((book) => {
     return book.distributedCountries.includes(req.params.country);
@@ -137,40 +137,8 @@ router.get("/igual/:year", (req, res) => {
     data: books.map((book) => ({ title: book.title, country: book.distributedCountries })),
   };
   return res.send(response); // devuelve la respuesta al cliente
-});*/
-
-router.get("/country/:country", async (req, res) => {
-  try {
-    // busca los libros que se distribuyen en el país buscado
-    const books = data.dataLibrary.books.filter((book) => {
-      return book.distributedCountries.includes(req.params.country);
-    });
-
-    // busca los autores de los libros encontrados
-    const authorIds = books.map((book) => book.authorId);
-    const authors = data.dataLibrary.authors.filter((author) => authorIds.includes(author.id));
-
-    // crea una respuesta con información sobre los autores y los libros que se distribuyen en el país buscado
-    const response = {
-      service: "authors_books",
-      architecture: "microservices",
-      length: authors.length,
-      data: authors.map((author) => ({
-        name: author.name,
-        country: author.country,
-        books: books
-          .filter((book) => book.authorId === author.id)
-          .map((book) => ({ title: book.title, country: book.distributedCountries })),
-      })),
-    };
-
-    // devuelve la respuesta al cliente
-    return res.send(response);
-  } catch (error) {
-    console.error(error);
-    return res.status(500).send("Error interno del servidor");
-  }
 });
+
 
 
 module.exports = router; // exporta el enrutador de Express para su uso en otras partes de la aplicación

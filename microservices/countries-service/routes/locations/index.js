@@ -1,9 +1,8 @@
 // Importamos la biblioteca Express
 const express = require("express");
-
+const fetch = require("node-fetch");
 // Importamos el archivo data-library.js que contiene la información sobre los países.
 const data = require("../../data/data-library");
-
 // Creamos un router de Express
 const router = express.Router();
 
@@ -43,6 +42,49 @@ router.get("/country/:capital", (req, res) => {
   return res.send(response);
 });
 
+router.get("/authors/:country", async (req, res) => {
+  try {
+    const countries = Object.keys(data.dataLibrary.countries).filter((key) => {
+      return data.dataLibrary.countries[key].capital.toLowerCase() === req.params.country.toLowerCase();
+    }).map((key) => {
+      return data.dataLibrary.countries[key];
+    });
+    const response = await fetch(`http://authors:3000/api/v2/authors/country/${countries[0].name}`);
+    const authors = await response.json();
+      const responseObj = {
+      service: "countries_authors",
+      architecture: "microservices",
+     //country: authors.data[0].name,
+      authors
+    };
+    res.status(200).json(responseObj);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 
+
+router.get("/books/:country", async (req, res) => {
+  try {
+    const countries = Object.keys(data.dataLibrary.countries).filter((key) => {
+      return data.dataLibrary.countries[key].capital.toLowerCase() === req.params.country.toLowerCase();
+    }).map((key) => {
+      return data.dataLibrary.countries[key];
+    });
+    const response = await fetch(`http://books:4000/api/v2/books/country/${countries[0].name}`);
+    const books = await response.json();
+      const responseObj = {
+      service: "countries_books",
+      architecture: "microservices",
+      books
+      
+    };
+    res.status(200).json(responseObj);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 // Exportamos el router
 module.exports = router;
