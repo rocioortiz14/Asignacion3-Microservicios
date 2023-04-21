@@ -1,3 +1,5 @@
+## Intrucciones para Ejecutar Proyecto
+
 run monolithic:
 `npm start`
 
@@ -115,3 +117,7 @@ Este servicio se llama `country` y utiliza la imagen construida en el directorio
 ```
 
 Este servicio se llama `nginx` y utiliza la imagen `nginx:latest` de Docker Hub. Se define un mapeo de puertos entre el puerto 8080 del contenedor y el puerto 8080 de la máquina host. También se define un volumen que vincula el archivo `nginx.conf` en el directorio actual con el archivo de configuración de nginx en el contenedor. Por último, se especifica que `nginx` depende de los servicios `monolithic`, `users`, `books` y `country`.
+
+
+##  Archivo Postma Collection
+Solicitudes HTTP y las colecciones Postman le ayudan a organizar y agrupar las solicitudes de API relacionadas
