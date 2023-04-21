@@ -124,21 +124,25 @@ router.get("/igual/:year", (req, res) => {
   return res.send(response); // devuelve la respuesta al cliente
 });
 
-router.get("/country/:country", (req, res) => {
-  // busca los libros que se distribuyen en el país buscado
-  const books = data.dataLibrary.books.filter((book) => {
-    return book.distributedCountries.includes(req.params.country);
+ // busca los libros que se distribuyen en el país buscado
+router.get("/country/:countries", (req, res) => {
+  // Separamos los países seleccionados en una matriz
+  const selectedCountries = req.params.countries.split(",");
+  // Filtramos los libros por país
+  const filteredBooks = data.dataLibrary.books.filter(book => {
+    return selectedCountries.some(country => book.distributedCountries.includes(country));
   });
+
+
   // crea una respuesta con información sobre los libros que se distribuyen en el país buscado
   const response = {
     service: "books",
     architecture: "microservices",
-    length: books.length,
-    data: books.map((book) => ({ title: book.title, country: book.distributedCountries })),
+    length: filteredBooks.length,
+    data: filteredBooks.map((book) => ({ title: book.title, country: book.distributedCountries })),
   };
   return res.send(response); // devuelve la respuesta al cliente
 });
-
 
 
 module.exports = router; // exporta el enrutador de Express para su uso en otras partes de la aplicación

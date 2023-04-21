@@ -60,26 +60,24 @@ router.get("/author/:name", (req, res) => {
 });
 
 
-// Creamos la ruta para obtener autores por su nombre
-router.get("/country/:author", (req, res) => {
-  // Filtramos los autores cuyo nombre coincide con el que se envía en la petición
-  const author = data.dataLibrary.authors.filter((author) => {
-    return author.country.includes(req.params.author);
+// Creamos la ruta para obtener autores por su pais
+router.get("/country/:countries", (req, res) => {
+  // Separamos los países seleccionados en una matriz
+  const selectedCountries = req.params.countries.split(",");
+  // Filtramos los autores por país
+  const filteredAuthors = data.dataLibrary.authors.filter(author => {
+    return selectedCountries.some(country => author.country.includes(country));
   });
-
   // Creamos un objeto de respuesta con los datos de los autores
   const response = {
     service: "authors",
     architecture: "microservices",
-    data: author,
+    data: filteredAuthors,
   };
 
   // Enviamos la respuesta
   return res.send(response);
 });
-
-
-
 // Exportamos el objeto Router
 module.exports = router;
 

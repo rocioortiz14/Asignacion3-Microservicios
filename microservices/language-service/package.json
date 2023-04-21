@@ -1,0 +1,17 @@
+{
+  "name": "language-service",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "express": "^4.18.2",
+    "fs": "^0.0.1-security",
+    "node-fetch": "^2.6.9"
+  }
+}
