@@ -51,78 +51,71 @@ router.get("/author/:author", async (req, res) => {
     return res.status(500).send("Error fetching authors data");
   }
 });
-//filtrar por rango de año 1900-1930
+
+
+/*router.get("/Year/:startYear/:endYear", (req, res) => {
+  const startYear = parseInt(req.params.startYear);
+  const endYear = parseInt(req.params.endYear);
+
+  // Validar que los años estén en el rango 1900-1930
+  if (isNaN(startYear) || isNaN(endYear) || startYear < 1900 || endYear > 1930 || startYear > endYear) {
+    return res.status(400).send("Los años deben estar en el rango 1900-1930 y el año de inicio no puede ser mayor que el año final.");
+  }
+
+  const books = data.dataLibrary.books.filter((book) => {
+    const year = parseInt(book.year);
+    return year >= startYear && year <= endYear;
+  });
+
+  const response = {
+    service: "books",
+    architecture: "microservices",
+    length: books.length,
+    data: books.map((book) => ({ title: book.title, year: book.year })),
+  };
+
+  logger(`Get book data filtered by year (startYear: ${startYear}, endYear: ${endYear})`);
+  return res.send(response);
+});*/
+
+
 router.get("/Year/:startYear/:endYear", (req, res) => {
-  const startYear = parseInt(req.params.startYear); // obtiene el parámetro "startYear"
-  const endYear = parseInt(req.params.endYear); // obtiene el parámetro "endYear"
-  const books = data.dataLibrary.books.filter((book) => {
-    const year = parseInt(book.year);
-    return year >= startYear && year <= endYear; // filtra los libros según el rango de años
-  });
-  const response = { // crea una respuesta con información sobre los libros filtrados
-    service: "books",
-    architecture: "microservices",
-    length: books.length,
-    data: books.map((book) => ({ title: book.title, year: book.year })),
-  };
-  logger(`Get book data filtered by year (startYear: ${startYear}, endYear: ${endYear})`); // registra un mensaje en los registros
-  return res.send(response); // devuelve la respuesta al cliente
-});
+  const startYear = parseInt(req.params.startYear);
+  const endYear = parseInt(req.params.endYear);
 
-//>= a 1900
-router.get("/Mayor/:Year", (req, res) => {
-  const Year = parseInt(req.params.Year); // obtiene el parámetro "Year"
+  // Validar que los años estén en el rango 1900-1930
+  if (isNaN(startYear) || isNaN(endYear) || startYear < 1900 || endYear > 1930 || startYear > endYear) {
+    return res.status(400).send("Los años deben estar en el rango 1900-1930 y el año de inicio no puede ser mayor que el año final.");
+  }
+
+  // Validar que los años sean mayores o iguales a 1900
+  if (startYear < 1900 || endYear < 1900) {
+    return res.status(400).send("Los años deben ser iguales o mayores a 1900.");
+  }
 
   const books = data.dataLibrary.books.filter((book) => {
     const year = parseInt(book.year);
-    return year >= Year ; // filtra los libros según el rango de años
+
+    // Validar año igual a 1900
+    if (startYear === 1900 && endYear === 1900) {
+      return year === 1900;
+    }
+
+    return year >= startYear && year <= endYear;
   });
-  const response = { // crea una respuesta con información sobre los libros filtrados
+
+  const response = {
     service: "books",
     architecture: "microservices",
     length: books.length,
     data: books.map((book) => ({ title: book.title, year: book.year })),
   };
-  logger(`Get book data filtered by year (añoMayora: ${Year})`); // registra un mensaje en los registros
-  return res.send(response); // devuelve la respuesta al cliente
-});
 
-//<= a 1900
-router.get("/menor/:year", (req, res) => {
-  const year = parseInt(req.params.year); // obtiene el parámetro "Year"
-
-  const books = data.dataLibrary.books.filter((book) => {
-    const years = parseInt(book.year);
-    return years < year // filtra los libros con año menor a 1900
-  });
-  const response = { // crea una respuesta con información sobre los libros filtrados
-    service: "books",
-    architecture: "microservices",
-    length: books.length,
-    data: books.map((book) => ({ title: book.title, year: book.year })),
-  };
-  logger(`Get book data filtered by year (añoMenora: ${year})`); // registra un mensaje en los registros
-  return res.send(response); // devuelve la respuesta al cliente
+  logger(`Get book data filtered by year (startYear: ${startYear}, endYear: ${endYear})`);
+  return res.send(response);
 });
 
 
-//= a 1900
-router.get("/igual/:year", (req, res) => {
-  const year = parseInt(req.params.year); // obtiene el parámetro "Year"
-
-  const books = data.dataLibrary.books.filter((book) => {
-    const years = parseInt(book.year);
-    return years === year // filtra los libros con año menor a 1900
-  });
-  const response = { // crea una respuesta con información sobre los libros filtrados
-    service: "books",
-    architecture: "microservices",
-    length: books.length,
-    data: books.map((book) => ({ title: book.title, year: book.year })),
-  };
-  logger(`Get book data filtered by year (añoIguala: ${year})`); // registra un mensaje en los registros
-  return res.send(response); // devuelve la respuesta al cliente
-});
 
  // busca los libros que se distribuyen en el país buscado
 router.get("/country/:countries", (req, res) => {

@@ -215,7 +215,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:8080/api/v2/books/author/Chinua",
+									"raw": "http://localhost:8080/api/v2/books/author/Dante/",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -226,7 +226,8 @@
 										"v2",
 										"books",
 										"author",
-										"Chinua"
+										"Dante",
+										""
 									]
 								}
 							},
@@ -251,75 +252,6 @@
 										"Year",
 										"1900",
 										"1930"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get books by Year menor a 1900",
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "http://localhost:8080/api/v2/books/menor/1900",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8080",
-									"path": [
-										"api",
-										"v2",
-										"books",
-										"menor",
-										"1900"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get books by Year igual a 1900",
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "http://localhost:8080/api/v2/books/igual/1900",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8080",
-									"path": [
-										"api",
-										"v2",
-										"books",
-										"igual",
-										"1900"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get books by Year mayor a 1900",
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "http://localhost:8080/api/v2/books/Mayor/1900",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8080",
-									"path": [
-										"api",
-										"v2",
-										"books",
-										"Mayor",
-										"1900"
 									]
 								}
 							},
@@ -593,7 +525,7 @@
 							"response": []
 						},
 						{
-							"name": "Get  lnfo Author by  code or Country",
+							"name": "Get  lnfo Author by  code",
 							"request": {
 								"method": "GET",
 								"header": [],

@@ -1,3 +1,4 @@
+
 const csv = require('csv-parser');
 const fs = require('fs');
 
@@ -8,6 +9,5 @@ fs.createReadStream(csvFilePath)
   .pipe(csv())
   .on('data', (data) => jsonArray.push(data))
   .on('end', () => {
-    //console.log(jsonArray); // array de objetos JSON
+    return jsonArray;
   });
-  return jsonArray;

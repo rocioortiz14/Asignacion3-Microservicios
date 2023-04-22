@@ -24,78 +24,6 @@ router.get("/", (req, res) => {
   return res.send(response);
 });
 
-// Creamos una ruta para obtener países por su capital
-router.get("/country/:capital", (req, res) => {
-   // Filtramos los países por su capital
-  const countries = Object.keys(data.dataLibrary.countries).filter((key) => {
-    return data.dataLibrary.countries[key].capital.toLowerCase() === req.params.capital.toLowerCase();
-  }).map((key) => {
-    return data.dataLibrary.countries[key];
-  });
-
-   // Creamos una respuesta con los datos de los países filtrados
-  const response = {
-    service: "countries",
-    architecture: "microservices",
-    length: countries.length,
-    data: countries,
-  };
- // Creamos una respuesta con los datos de los países filtrados
-  logger("Get countries data");
-  // Enviamos la respuesta al cliente
-  return res.send(response);
-});
-// Creamos una ruta para obtener autores por su capital
-router.get("/authors/:country", async (req, res) => {
-  //obtenemos informacion soibre los paises y filtramos aquellos cuya capital coincide
-  try {
-    const countries = Object.keys(data.dataLibrary.countries).filter((key) => {
-      return data.dataLibrary.countries[key].capital.toLowerCase() === req.params.country.toLowerCase();
-    }).map((key) => {
-      return data.dataLibrary.countries[key];
-    });
-    // Creamos una respuesta con los datos filtrados
-    const response = await fetch(`http://authors:3000/api/v2/authors/country/${countries[0].name}`);
-    const authors = await response.json();
-      const responseObj = {
-      service: "countries_authors",
-      architecture: "microservices",
-      authors
-    };
-    //respuesta al saervidor
-    res.status(200).json(responseObj);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-});
-
-//obtener los libros de un país 
-router.get("/books/:country", async (req, res) => {
-  //primero, se filtran las claves de los países que tienen la capital que coincide con el parámetro
-  try {
-    const countries = Object.keys(data.dataLibrary.countries).filter((key) => {
-      return data.dataLibrary.countries[key].capital.toLowerCase() === req.params.country.toLowerCase();
-    }).map((key) => {
-      return data.dataLibrary.countries[key];
-    });
-    //petición al microservicio de books
-    const response = await fetch(`http://books:4000/api/v2/books/country/${countries[0].name}`);
-    const books = await response.json();
-    //crea un objeto de respuesta 
-      const responseObj = {
-      service: "countries_books",
-      architecture: "microservices",
-      books
-      
-    };
-    res.status(200).json(responseObj);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-});
-
 //obtener una lista de países que hablan un determinado idioma
 router.get("/country/language/:codeCountry", (req, res) => {
   const codeCountry = req.params.codeCountry;
@@ -107,5 +35,47 @@ router.get("/country/language/:codeCountry", (req, res) => {
   //devuelve una respuesta JSON
   return res.json(response);
   })
+
+
+  router.get("/country/:capital", async (req, res) => {
+    try {
+      const capital = req.params.capital.toLowerCase();
+      const countries = Object.keys(data.dataLibrary.countries).filter((key) => {
+        return data.dataLibrary.countries[key].capital.toLowerCase() === capital;
+      }).map((key) => {
+        return data.dataLibrary.countries[key];
+      });
+  
+      if (countries.length === 0) {
+        res.status(404).json({ message: "Capital not found" });
+      } else {
+        const countryName = countries[0].name;
+        
+        // Get authors from the country
+        const authorsResponse = await fetch(`http://authors:3000/api/v2/authors/country/${countryName}`);
+        const authors = await authorsResponse.json();
+        
+        // Get books from the country
+        const booksResponse = await fetch(`http://books:4000/api/v2/books/country/${countryName}`);
+        const books = await booksResponse.json();
+        
+        // Create the response object
+        const responseObj = {
+          service: "countries",
+          architecture: "microservices",
+          country: countryName,
+          authors: authors,
+          books: books
+        };
+        
+        res.status(200).json(responseObj);
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  
 // Exportamos el router
 module.exports = router;
