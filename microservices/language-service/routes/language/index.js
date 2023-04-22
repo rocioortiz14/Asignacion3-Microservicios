@@ -24,9 +24,9 @@ router.get('/', (req, res) => {
   const jsonArray = [];
 
   fs.createReadStream('./data/language-codes.csv')
-    .pipe(csv())
-    .on('data', (data) => jsonArray.push(data))
-    .on('end', () => {
+  .pipe(csv({ headers: ['code', 'name'] })) // Reemplaza los valores de 'col1', 'col2', 'col3', 'col4' con los nombres reales de las columnas en tu archivo CSV
+  .on('data', (data) => jsonArray.push(data))
+  .on('end', () => {
       // Creamos un objeto de respuesta con los datos del array de objetos JSON
       const response = {
         service: "language",
@@ -40,112 +40,42 @@ router.get('/', (req, res) => {
 });
 
 
-/*router.get('/language/:codeCountry', (req, res) => {
+
+router.get('/language/:languageCode', async (req, res) => {
   const jsonArray = [];
-
-  fs.createReadStream('./data/language-codes.csv')
-    .pipe(csv())
-    .on('data', (data) => jsonArray.push(data))
-    .on('end',async() => {
-
-      
-      const resultado =  await fetch(`http://countries:5000/api/v2/countries/country/language/${req.params.codeCountry}`);
-      const paises =   await resultado.json();
-      // Creamos un objeto de respuesta con los datos del array de objetos JSON
-      const response = {
-        service: "language",
-        architecture: "microservices",
-        data: paises,
-      };
-
-      // Enviamos la respuesta
-      return res.send(response);
-    });
-});*/
-
-
-/*router.get('/books/:countrydistributed', async (req, res) => {
-
-    const jsonArray = [];
-
-    // Lee el archivo CSV y lo convierte a un array de objetos JSON
-    fs.createReadStream('./data/language-codes.csv')
-    .pipe(csv())
-    .on('data', (data) => jsonArray.push(data))
-    .on('end',async() => {
-
-      // Busca los países que hablan el lenguaje especificado
-      const resultadoPaises = await fetch(`http://countries:5000/api/v2/countries/country/language/${req.params.countrydistributed}`);
-      const paises = await resultadoPaises.json();
-      const nameArray = paises.countries.map(obj => obj.name);
-
-
-      // Obtiene los libros que se originaron en los países encontrados
-      const resultadoBooks = await fetch(`http://books:4000/api/v2/books/country/${nameArray.join(',')}`);
-      const libros = await resultadoBooks.json();
-
-      // Crea un objeto de respuesta con los datos de los autores
-      const response = {
-        service: "books",
-        architecture: "microservices",
-        data: libros
-      };
-
-      // Envía la respuesta
-      return res.send(response);
-    });
   
-});*/
-
-
-
-
-
-router.get('/language/:codeCountry', (req, res) => {
-  const jsonArray = [];
-
-  // Leer el archivo 'language-codes.csv' y almacenar los datos en el arreglo 'jsonArray'
+  // Lee el archivo CSV y lo convierte a un array de objetos JSON
   fs.createReadStream('./data/language-codes.csv')
-    .pipe(csv())
-    .on('data', (data) => jsonArray.push(data))
-    .on('end', async () => {
-      // Obtener el código de lenguaje buscado desde el parámetro de la URL
-      const codeCountry = req.params.codeCountry.toLowerCase();
+  .pipe(csv({ headers: ['code', 'name'] })) // 
+  .on('data', (data) => jsonArray.push(data))
+  .on('end',  async()=> {
+      // Busca los países que hablan el lenguaje especificado
+  const resultadoPaises = await fetch(`http://countries:5000/api/v2/countries/country/language/${req.params.languageCode}`);
+  const paises = await resultadoPaises.json();
+  const nameArray = paises.countries.map(obj => obj.name);
 
-      // Verificar si el código de lenguaje es válido
-      const language = jsonArray.find((lang) => lang["ISO 639-1 Code"] === codeCountry || lang["Language"] === codeCountry);
+  // Obtiene los autores que nacieron en los países encontrados
+  const resultadoAutores = await fetch(`http://authors:3000/api/v2/authors/country/${nameArray.join(',')}`);
+  const autores = await resultadoAutores.json();
 
-      if (!language) {
-        // Si el código de lenguaje no es válido, enviar una respuesta de error
-        return res.status(400).send({ error: "Código de lenguaje no válido" });
-      }
+  // Obtiene los libros que se originaron en los países encontrados
+  const resultadoBooks = await fetch(`http://books:4000/api/v2/books/country/${nameArray.join(',')}`);
+  const libros = await resultadoBooks.json();
 
-      // Obtener la información de los países que hablan el lenguaje buscado
-      const resultado = await fetch(`http://countries:5000/api/v2/countries/country/language/${codeCountry}`);
-      const paises = await resultado.json();
+  // Crea un objeto de respuesta con los datos de los autores y libros
+  const response = {
+    service: "language",
+    architecture: "microservices",
+    data: {
+      authors: autores,
+      books: libros
+    }
+  };
 
-      // Obtener la información del autor que haya nacido en cada uno de los países que hablan el lenguaje buscado
-      const autores = await Promise.all(
-        paises.map(async (pais) => {
-          const resultadoAutor = await fetch(`http://authors:5000/api/v1/authors/country/${pais.alpha2Code}`);
-          const autor = await resultadoAutor.json();
-          return { pais, autor };
-        })
-      );
-
-      // Crear un objeto de respuesta con los datos del arreglo de objetos 'autores'
-      const response = {
-        service: "language",
-        architecture: "microservices",
-        data: autores,
-      };
-
-      // Enviar la respuesta
-      return res.send(response);
-    });
+  // Envía la respuesta
+  return res.send(response);
 });
-
-
+});
 
 // Exportamos el objeto Router
 module.exports = router;
